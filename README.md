@@ -1,10 +1,10 @@
 # Ride accept predictor
 
-## 0. Context
+## 0. Context & problem definition
 
 This project aimed for building a predictive algorithm that decides whether a driver registered to provide rides for customers of a mobile ride-hailing app and who is requested to take a ride offer, is going to eventually accept that offer or not. Assuming nearby drivers are available, the backend of the app sends a booking requests to a driver, who can accept or declinethe ride. If the driver declines, the app can query one or more extra drivers (under certain conditions), therefore issuing more booking requests for the same ride request.
 
-Due to the time constraint (10 hours) the aim was to create a model of reasonable prediction quality (minimum viable product - MVP - approach) driven by a few engineered features. In future steps acquiring deeper domain knowledge about ride-hailing transportation especially time- and location-dependent supply and demand could be possible which would support creating features of even better quality.
+Due to the time constraint (10 hours) the aim was to create a model of reasonable prediction quality (minimum viable product - MVP - approach) driven by a few engineered features. Assuming this project was real data science prject in the industry, a subsequent step would be acquiring deeper domain knowledge about ride-hailing transportation especially regarding the dynamics and influencing factors of time and location-dependent supply and demand of both drivers and ride hailing customers alike which would support creating features of even better predictive quality.
 
 ![cover](/img/cover.jpg)
 
@@ -44,32 +44,15 @@ Each line represents a driver state change.
 * `new_state` : the driver's state, which can be one of
 * `{ connected , disconnected , began_ride , ended_ride }`
 
-
-## 2. Usage
-
-To run this notebook, install the necessary packages listed either in the `requirements_conda.txt` (if your run it in a conda environment) or `requirements_pip.txt` (if installation via pip).
-
-For conda, do
-```bash
-conda create --name <env> --file requirements_conda.txt
-```
-
-for pip, do
-```bash
-python3 -m venv env
-source env/bin/activate
-pip install -r requirements_pip.txt
-```
-
-## 4. Analysis
+## 2. Analysis
 
 Due to time constraints for this project I aimed for finding a balance between the aspects of data exploration, feature engineering, modeling and interpretation of the results. During the project several ideas came up regarding how to expand and branch off the project within these various analysis steps and add several more.
 
 Upon inspecting the data and convincing myself of the cleanliness of the data, the decision was made (with respect to the goal of the project) to left join the `bookingRequest` table with the `rideRequest` table on the `ride_id` column and the resulting DataFrame `df_rides` underwent a data inspection and EDA in Pandas.
 
-### 4.1. Data inspection & exploration
+### 2.1. Data inspection & exploration
 
-First task consisted of inspecting the three logfiles and getting an overview of the joined dataframe `df_rides` and the meaning of the data (see chapter **1. Data**). Several things were apparent:
+The first task consisted of inspecting the three logfiles and getting an overview of the joined dataframe `df_rides` and the meaning of the data (see chapter **1. Data**). Several things were apparent:
 
 * the three log files contained data roughly spanning over a timeframe of the same 24 hours:
 
@@ -79,18 +62,18 @@ First task consisted of inspecting the three logfiles and getting an overview of
   bookingRequests.log | 2018-10-29 12:04:49.561193728 | 2018-10-30 11:53:58.996917504
   drivers.log | 2018-10-29 12:00:01.116698112 | 2018-10-30 11:54:29.890972416
 
-* I gained a rough overview of the distribution of the numerical data. It could be concluded that the geographical coordinates are perfectly normal distributed (most likely artificially generated) roughly around the city center of Paris. A quick plot with Folium (not contained in the notebook because of limited memory on github) confirmed this.
+* I gained a rough overview of the distribution of the numerical data. It could be concluded that the geographical coordinates are perfectly normal distributed (most likely artificially generated) roughly around the city center of a big European city. A quick plot with Folium (not contained in the notebook because of limited memory on github) confirmed this.
 Furthermore, the target variable `driver_accepted` is imbalanced, which made a sampling technique necessary before model training.
 
 ![img](img/numerics.png)
 
 * the cleanliness of the data was assessed. There were no missing values. No inference of missing values was necessary. Also statistical outliers are hardly present / wouldn't impact the prediction here.
 
-### 4.2. Feature engineering
+### 2.2. Feature engineering
 
 Several features were engineered or can be engineered in the future which contributed to the predictive power of the model with respect to if a driver accepts a ride. For each a function was written which conveniently could be used in a preprocessing pipeline to build up the ML ready dataframe.
 
-#### 4.2.1 Geographical distances between rider, driver and destination (implemented)
+#### 2.2.1 Geographical distances between rider, driver and destination (implemented)
 
 A driver might me influenced in her decision to accept a request by either one or a combination of these distances:
 
@@ -106,7 +89,7 @@ In the following I created three scatterplots containing every booking request i
 
 One can identify overweights of `driver_accept=False` in certain time periods (around 3am e.g.) for all three kinds of distances and as well as an distinctive overweight of `driver_accept=False` towards higher distances of driver-origin (first plot). This way one can indeed immediately get an idea of the importance of at least the `logget_at` and the `driver_origin_distance` feature to be important predictors for the target variable.
 
-#### 4.2.2. How far away from the city center is the request / the destination? (not yet implemented)
+#### 2.2.2. How far away from the city center is the request / the destination? (not yet implemented)
 
 One can conclude from the geographical normal distribution of request data that most rides are requested within the city center. A drivers preference regarding which rides to accept might be influenced by the assumption where most rides are requested since this allegedly would increase his/her chances to catch the next request after dropping off the customer /rider in quick succession - increasing his/her daily profit.
 
@@ -114,13 +97,13 @@ Since we saw that all geographic coordinates are almost perfectly normally distr
 
 **A more sophisticated approach for real world data** would probably be to cluster the multitude of geographic coordinates of all ride requests of the past with an unsupervised algorithm e.g. K-Means, build not only one but multiple cluster centers (which would correspond roughly to more "vivid" or more densely populated areas) and then calculate for every ride request the distance between the rider and the next cluster. The idea being that the closer to one of the vivid areas a rider requests a ride, the earlier the requested driver hopes to finish the ride also within that area and pick up the next rider in quicker succession increasing his/her acceptance level. An assumed behavior of drivers could therefore be to stick around in the vicinity of venues, places of active nightlife etc.
 
-#### 4.2.3. Time difference between ride request made and booking request made (implemented, doesn't play a role)
+#### 2.2.3. Time difference between ride request made and booking request made (implemented, doesn't play a role)
 
 A driver might expect a more displeased (pleased) rider if too much (only little) time has passed since the request was made, risking a negative (hoping for a positive) review. Therefore - as it was the initial though - this time difference could be of importance. It was discovered only after analyzing the feature importance of the trained model that this feature does hardly play a role, since the system seems to issue booking request almost **immediately** after ride request, and only in very rare cases couple of seconds pass between these events.
 
 ![img](img/time_diff_hist.png)
 
-#### 4.2.4. How many rides has a driver completed since last 'connected' when booking request is issued (implemented)
+#### 2.2.4. How many rides has a driver completed since last 'connected' when booking request is issued (implemented)
 
 A driver might be more inclined to accept a booking request when having completed only few rides / less inclined when already completed subjectively enough. This theory is also motivated by some visualizations done in the EDA process. To engineer this feature, the joined `bookingRequest` and `rideRequest` table was combined with the `drivers` table: For each individual row of that joined table `df_rides`, the `driver_id` together with the `logged_at` epoch was used to 1) group the `driver` table by that `driver_id` and then sum up how many cases of `ended_ride` states occured up to that `logged_at` epoch. This sum was appended as another column `no_of_accumulated_rides` to the main `df_rides` DataFrame.
 
@@ -138,17 +121,17 @@ It can be really beneficial to analyze these plots more in depth which can provi
 ![img](img/dist_rider_driver.png)
 (fig. 3)
 
-#### 4.2.5. Accumulated distance that a driver has travelled since last 'connected' when booking request is issued (not yet implemented)
+#### 2.2.5. Accumulated distance that a driver has travelled since last 'connected' when booking request is issued (not yet implemented)
 
 A driver might be less inclined to accept a new booking the longer the accumulated distance is on his/her workday.
 
-#### 4.2.6. `is_in_ride` (implemented, but omitted)
+#### 2.2.6. `is_in_ride` (implemented, but omitted)
 
 Another crucial feature for the target variable could be if a driver is finding himself/herself in a ride with a customer when a new booking request arrives.
 
 It was found and confirmed though that booking requests are only issued to those drivers who are connected and free. Therefore this feature wouldn't have any predictive power and wasn't implemented.
 
-### 4.3. Model building
+### 2.3. Model building
 
 A baseline model (logistic regression) with `df_rides` was quickly build with no preprocessing or feature engineering whatsoever. Expectedly it performed poorly in predicting the underbalanced class (`driver_accepted=True`).
 
@@ -156,7 +139,7 @@ I therefore switched to training a **Random Forest** model, after using SMOTE (s
 
 I only optimized the RandomForest with regards to the number of trees (result ca. n=150) using a GridSearch with 10-fold cross validation with accuracy score as scoring paramenter
 
-#### 4.3.1 Model results
+### 2.4. Model results
 
 Looking at the metrics, the confusion matrices, the ROC curve and the AUC one can say that the model does a decent job in minimizing the False Positives and False Negatives.
 
@@ -202,3 +185,19 @@ Below the feature importances are shown which were calculated during the model t
 * Use more sophisticated sampling methods (combined over- and undersampling)
 * Try Logistic Regression
 --->
+
+## 3. Usage
+
+To run this notebook, install the necessary packages listed either in the `requirements_conda.txt` (if your run it in a conda environment) or `requirements_pip.txt` (if installation via pip).
+
+For conda, do
+```bash
+conda create --name <env> --file requirements_conda.txt
+```
+
+for pip, do
+```bash
+python3 -m venv env
+source env/bin/activate
+pip install -r requirements_pip.txt
+```
