@@ -184,7 +184,7 @@ Below the feature importances are shown which were calculated during the model t
 
 * Use more sophisticated sampling methods (combined over- and undersampling)
 * Try Logistic Regression
---->
+
 
 ## 3. Usage
 
@@ -201,3 +201,5 @@ python3 -m venv env
 source env/bin/activate
 pip install -r requirements_pip.txt
 ```
+
+--->
