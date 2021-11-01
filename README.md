@@ -2,9 +2,9 @@
 
 ## 0. Context & problem definition
 
-This project aimed for building a predictive algorithm that decides whether a driver registered to provide rides for customers of a mobile ride-hailing app and who is requested to take a ride offer, is going to eventually accept that offer or not. Assuming nearby drivers are available, the backend of the app sends a booking requests to a driver, who can accept or declinethe ride. If the driver declines, the app can query one or more extra drivers (under certain conditions), therefore issuing more booking requests for the same ride request.
+This project aimed for building a predictive algorithm that decides whether a driver registered to provide rides for customers of a mobile ride-hailing app and who is requested to take a ride offer, is going to eventually accept that offer or not. Assuming nearby drivers are available, the backend of the app sends a booking requests to a driver, who can accept or decline the ride. If the driver declines, the app can query one or more extra drivers (under certain conditions), therefore issuing more booking requests for the same ride request.
 
-Due to the time constraint (10 hours) the aim was to create a model of reasonable prediction quality (minimum viable product - MVP - approach) driven by a few engineered features. Assuming this project was real data science prject in the industry, a subsequent step would be acquiring deeper domain knowledge about ride-hailing transportation especially regarding the dynamics and influencing factors of time and location-dependent supply and demand of both drivers and ride hailing customers alike which would support creating features of even better predictive quality.
+Due to the time constraint (10 hours) the aim was to create a model of reasonable prediction quality (minimum viable product - MVP - approach) driven by a few engineered features. Assuming this project was real data science project in the industry a subsequent step would be acquiring deeper domain knowledge about ride-hailing transportation sector especially regarding the dynamics and influencing factors of time and location-dependent supply and demand of both drivers and ride hailing customers alike which would support creating features of even better predictive quality.
 
 ![cover](/img/cover.jpg)
 
